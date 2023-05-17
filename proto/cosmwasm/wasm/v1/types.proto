@@ -71,6 +71,18 @@ message CodeInfo {
   AccessConfig instantiate_config = 5 [ (gogoproto.nullable) = false ];
 }
 
+// CodeInfo is data for the uploaded contract WASM code
+message CodeInfoNew {
+  // Creator address who initially stored the code
+  string creator = 1;
+  // CodeHash is the unique identifier created by wasmvm
+  bytes code_hash = 2;
+  // Used in v1beta1
+  reserved 3, 4;
+  // InstantiateConfig access control to apply on contract creation, optional
+  AccessConfig instantiate_config = 5 [ (gogoproto.nullable) = false ];
+}
+
 // ContractInfo stores a WASM contract instance
 message ContractInfo {
   option (gogoproto.equal) = true;
