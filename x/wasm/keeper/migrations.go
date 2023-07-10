@@ -110,6 +110,9 @@ func (m Migrator) Migrate1to2(ctx sdk.Context) error {
 		return false
 	})
 
+	// increase the last code ID
+	m.keeper.autoIncrementID(ctx, types.KeyLastCodeID)
+
 	return nil
 }
 
