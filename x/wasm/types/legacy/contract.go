@@ -22,11 +22,9 @@ func NewContractInfo(codeID uint64, address, creator, admin sdk.AccAddress, init
 
 // NewCodeInfo creates new code info from input
 func NewCodeInfo(codeID uint64, creator sdk.AccAddress, hash []byte) CodeInfo {
-
 	return CodeInfo{
-		CodeID: codeID,
+		CodeID:   codeID,
 		CodeHash: hash,
-		Creator: creator.String(),
+		Creator:  creator.String(),
 	}
-
 }

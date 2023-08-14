@@ -88,7 +88,6 @@ func (c *ContractInfo) ValidateBasic() error {
 	}
 
 	return nil
-
 }
 
 func (c ContractInfo) InitialHistory(initMsg []byte) ContractCodeHistoryEntry {

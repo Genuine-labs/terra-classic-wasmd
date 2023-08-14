@@ -14,7 +14,6 @@ import (
 )
 
 func TestMigrateCodeFromLegacy(t *testing.T) {
-
 	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
 	wasmkeeper := keepers.WasmKeeper
 	migrator := NewMigrator(*wasmkeeper)
@@ -33,7 +32,6 @@ func TestMigrateCodeFromLegacy(t *testing.T) {
 	require.Equal(t, hash, codeInfo.CodeHash, "Wrong hash after code migration")
 	require.Equal(t, creator.String(), codeInfo.Creator, "Wrong code creator after code migration")
 	require.Equal(t, codeInfo.InstantiateConfig, wasmkeeper.getInstantiateAccessConfig(ctx).With(creator), "Wrong InstantiateAccessConfig after code migration")
-
 }
 
 // integration testing of smart contract
@@ -130,7 +128,6 @@ func newLegacyContract(wasmkeeper *Keeper, ctx sdk.Context, creator sdk.AccAddre
 
 // StoreCodeLegacy stores a legacy code info into the code info store
 func newLegacyCode(wasmkeeper *Keeper, ctx sdk.Context, id uint64, creator sdk.AccAddress, hash []byte) legacytypes.CodeInfo {
-
 	codeInfo := legacytypes.NewCodeInfo(id, creator, hash)
 	wasmkeeper.SetLegacyCodeInfo(ctx, id, codeInfo)
 	wasmkeeper.Logger(ctx).Debug("storing new contract", "code_id", id)

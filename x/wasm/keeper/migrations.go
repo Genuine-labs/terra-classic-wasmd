@@ -90,7 +90,6 @@ func (m Migrator) Migrate1to2(ctx sdk.Context) error {
 	// TODO
 	m.keeper.Logger(ctx).Info("#### Migrating Contract Info ###")
 	m.keeper.IterateLegacyContractInfo(ctx, func(contractInfo legacytypes.ContractInfo) bool {
-
 		contractAddress := sdk.MustAccAddressFromBech32(contractInfo.Address)
 
 		ctx.Logger().Info(fmt.Sprintf("Migrating contract address: %s", contractAddress.String()))
