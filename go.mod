@@ -180,4 +180,4 @@ replace (
 )
 
 // This replace is for backported FundCommunityPoolMsg in wasmvm
-replace github.com/CosmWasm/wasmvm => github.com/classic-terra/wasmvm v1.1.1-terra.2
+replace github.com/CosmWasm/wasmvm => github.com/classic-terra/wasmvm v1.1.1-terra.2-rc.0
