@@ -15,7 +15,7 @@ import (
 
 func TestIBCReflectContract(t *testing.T) {
 	// scenario:
-	//  chain A: ibc_reflect_send.wasm
+	//  chain A: ibc_reflect_segond.wasm
 	//  chain B: reflect.wasm + ibc_reflect.wasm
 	//
 	//  Chain A "ibc_reflect_send" sends a IBC packet "on channel connect" event to chain B "ibc_reflect"
