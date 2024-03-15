@@ -29,7 +29,7 @@ type decoratedKeeper interface {
 	unpinCode(ctx sdk.Context, codeID uint64) error
 	execute(ctx sdk.Context, contractAddress, caller sdk.AccAddress, msg []byte, coins sdk.Coins) ([]byte, error)
 	Sudo(ctx sdk.Context, contractAddress sdk.AccAddress, msg []byte) ([]byte, error)
-	setContractInfoExtension(ctx sdk.Context, contract sdk.AccAddress, extra types.ContractInfoExtension) error
+	// setContractInfoExtension(ctx sdk.Context, contract sdk.AccAddress, extra types.ContractInfoExtension) error
 	setAccessConfig(ctx sdk.Context, codeID uint64, caller sdk.AccAddress, newConfig types.AccessConfig, autz types.AuthorizationPolicy) error
 	ClassicAddressGenerator() AddressGenerator
 }
@@ -119,10 +119,10 @@ func (p PermissionedKeeper) UnpinCode(ctx sdk.Context, codeID uint64) error {
 	return p.nested.unpinCode(ctx, codeID)
 }
 
-// SetContractInfoExtension updates the extra attributes that can be stored with the contract info
-func (p PermissionedKeeper) SetContractInfoExtension(ctx sdk.Context, contract sdk.AccAddress, extra types.ContractInfoExtension) error {
-	return p.nested.setContractInfoExtension(ctx, contract, extra)
-}
+// // SetContractInfoExtension updates the extra attributes that can be stored with the contract info
+// func (p PermissionedKeeper) SetContractInfoExtension(ctx sdk.Context, contract sdk.AccAddress, extra types.ContractInfoExtension) error {
+// 	return p.nested.setContractInfoExtension(ctx, contract, extra)
+// }
 
 // SetAccessConfig updates the access config of a code id.
 func (p PermissionedKeeper) SetAccessConfig(ctx sdk.Context, codeID uint64, caller sdk.AccAddress, newConfig types.AccessConfig) error {

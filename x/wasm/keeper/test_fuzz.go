@@ -47,7 +47,7 @@ func FuzzContractCodeHistory(m *types.ContractCodeHistoryEntry, c fuzz.Continue)
 		panic(err)
 	}
 	c.Fuzz(&m.Updated)
-	m.Operation = types.AllCodeHistoryTypes[c.Int()%len(types.AllCodeHistoryTypes)]
+	// m.Operation = types.AllCodeHistoryTypes[c.Int()%len(types.AllCodeHistoryTypes)]
 }
 
 func FuzzStateModel(m *types.Model, c fuzz.Continue) {

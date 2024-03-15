@@ -429,10 +429,10 @@ func TestInstantiate(t *testing.T) {
 	assert.Equal(t, "demo contract 1", info.Label)
 
 	exp := []types.ContractCodeHistoryEntry{{
-		Operation: types.ContractCodeHistoryOperationTypeInit,
-		CodeID:    example.CodeID,
-		Updated:   types.NewAbsoluteTxPosition(ctx),
-		Msg:       initMsgBz,
+		// Operation: types.ContractCodeHistoryOperationTypeInit,
+		CodeID:  example.CodeID,
+		Updated: types.NewAbsoluteTxPosition(ctx),
+		Msg:     initMsgBz,
 	}}
 	assert.Equal(t, exp, keepers.WasmKeeper.GetContractHistory(ctx, gotContractAddr))
 
@@ -1282,15 +1282,15 @@ func TestMigrate(t *testing.T) {
 			assert.Equal(t, spec.expIBCPort, cInfo.IBCPortID != "", cInfo.IBCPortID)
 
 			expHistory := []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeInit,
-				CodeID:    spec.fromCodeID,
-				Updated:   types.NewAbsoluteTxPosition(ctx),
-				Msg:       initMsgBz,
+				// Operation: types.ContractCodeHistoryOperationTypeInit,
+				CodeID:  spec.fromCodeID,
+				Updated: types.NewAbsoluteTxPosition(ctx),
+				Msg:     initMsgBz,
 			}, {
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    spec.toCodeID,
-				Updated:   types.NewAbsoluteTxPosition(ctx),
-				Msg:       spec.migrateMsg,
+				//Operation: types.ContractCodeHistoryOperationTypeMigrate,
+				CodeID:  spec.toCodeID,
+				Updated: types.NewAbsoluteTxPosition(ctx),
+				Msg:     spec.migrateMsg,
 			}}
 			assert.Equal(t, expHistory, keepers.WasmKeeper.GetContractHistory(ctx, contractAddr))
 

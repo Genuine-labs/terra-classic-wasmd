@@ -964,19 +964,19 @@ func (k Keeper) InitializePinnedCodes(ctx sdk.Context) error {
 	return nil
 }
 
-// setContractInfoExtension updates the extension point data that is stored with the contract info
-func (k Keeper) setContractInfoExtension(ctx sdk.Context, contractAddr sdk.AccAddress, ext types.ContractInfoExtension) error {
-	info := k.GetContractInfo(ctx, contractAddr)
-	if info == nil {
-		return types.ErrNoSuchContractFn(contractAddr.String()).
-			Wrapf("address %s", contractAddr.String())
-	}
-	if err := info.SetExtension(ext); err != nil {
-		return err
-	}
-	k.storeContractInfo(ctx, contractAddr, info)
-	return nil
-}
+// // setContractInfoExtension updates the extension point data that is stored with the contract info
+// func (k Keeper) setContractInfoExtension(ctx sdk.Context, contractAddr sdk.AccAddress, ext types.ContractInfoExtension) error {
+// 	info := k.GetContractInfo(ctx, contractAddr)
+// 	if info == nil {
+// 		return types.ErrNoSuchContractFn(contractAddr.String()).
+// 			Wrapf("address %s", contractAddr.String())
+// 	}
+// 	if err := info.SetExtension(ext); err != nil {
+// 		return err
+// 	}
+// 	k.storeContractInfo(ctx, contractAddr, info)
+// 	return nil
+// }
 
 // setAccessConfig updates the access config of a code id.
 func (k Keeper) setAccessConfig(ctx sdk.Context, codeID uint64, caller sdk.AccAddress, newConfig types.AccessConfig, authz types.AuthorizationPolicy) error {

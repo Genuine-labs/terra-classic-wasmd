@@ -283,7 +283,7 @@ func queryContractInfo(ctx sdk.Context, addr sdk.AccAddress, keeper types.ViewKe
 			Wrapf("address %s", addr.String())
 	}
 	return &types.QueryContractInfoResponse{
-		Address:      addr.String(),
+		// Address:      addr.String(),
 		ContractInfo: *info,
 	}, nil
 }

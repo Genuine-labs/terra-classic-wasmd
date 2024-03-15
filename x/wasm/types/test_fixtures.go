@@ -126,10 +126,10 @@ func ContractInfoFixture(mutators ...func(*ContractInfo)) ContractInfo {
 // ContractCodeHistoryEntryFixture test fixture
 func ContractCodeHistoryEntryFixture(mutators ...func(*ContractCodeHistoryEntry)) ContractCodeHistoryEntry {
 	fixture := ContractCodeHistoryEntry{
-		Operation: ContractCodeHistoryOperationTypeInit,
-		CodeID:    1,
-		Updated:   ContractInfoFixture().Created,
-		Msg:       []byte(`{"foo":"bar"}`),
+		// Operation: ContractCodeHistoryOperationTypeInit,
+		CodeID:  1,
+		Updated: ContractInfoFixture().Created,
+		Msg:     []byte(`{"foo":"bar"}`),
 	}
 	for _, m := range mutators {
 		m(&fixture)

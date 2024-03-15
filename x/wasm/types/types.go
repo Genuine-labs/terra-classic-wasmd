@@ -2,14 +2,14 @@ package types
 
 import (
 	"fmt"
-	"reflect"
+	// "reflect"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	"github.com/cosmos/gogoproto/proto"
 
 	errorsmod "cosmossdk.io/errors"
 
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	// codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -54,7 +54,7 @@ func NewCodeInfo(codeHash []byte, creator sdk.AccAddress, instantiatePermission 
 	}
 }
 
-var AllCodeHistoryTypes = []ContractCodeHistoryOperationType{ContractCodeHistoryOperationTypeGenesis, ContractCodeHistoryOperationTypeInit, ContractCodeHistoryOperationTypeMigrate}
+// var AllCodeHistoryTypes = []ContractCodeHistoryOperationType{ContractCodeHistoryOperationTypeGenesis, ContractCodeHistoryOperationTypeInit, ContractCodeHistoryOperationTypeMigrate}
 
 // NewContractInfo creates a new instance of a given WASM contract info
 func NewContractInfo(codeID uint64, creator, admin sdk.AccAddress, label string, createdAt *AbsoluteTxPosition) ContractInfo {
@@ -94,40 +94,40 @@ func (c *ContractInfo) ValidateBasic() error {
 	if err := ValidateLabel(c.Label); err != nil {
 		return errorsmod.Wrap(err, "label")
 	}
-	if c.Extension == nil {
-		return nil
-	}
+	// if c.Extension == nil {
+	// 	return nil
+	// }
 
-	e, ok := c.Extension.GetCachedValue().(validatable)
-	if !ok {
-		return nil
-	}
-	if err := e.ValidateBasic(); err != nil {
-		return errorsmod.Wrap(err, "extension")
-	}
+	// e, ok := c.Extension.GetCachedValue().(validatable)
+	// if !ok {
+	// 	return nil
+	// }
+	// if err := e.ValidateBasic(); err != nil {
+	// 	return errorsmod.Wrap(err, "extension")
+	// }
 	return nil
 }
 
 // SetExtension set new extension data. Calls `ValidateBasic() error` on non nil values when method is implemented by
 // the extension.
-func (c *ContractInfo) SetExtension(ext ContractInfoExtension) error {
-	if ext == nil {
-		c.Extension = nil
-		return nil
-	}
-	if e, ok := ext.(validatable); ok {
-		if err := e.ValidateBasic(); err != nil {
-			return err
-		}
-	}
-	codecAny, err := codectypes.NewAnyWithValue(ext)
-	if err != nil {
-		return errorsmod.Wrap(sdkerrors.ErrPackAny, err.Error())
-	}
+// func (c *ContractInfo) SetExtension(ext ContractInfoExtension) error {
+// 	if ext == nil {
+// 		c.Extension = nil
+// 		return nil
+// 	}
+// 	if e, ok := ext.(validatable); ok {
+// 		if err := e.ValidateBasic(); err != nil {
+// 			return err
+// 		}
+// 	}
+// 	codecAny, err := codectypes.NewAnyWithValue(ext)
+// 	if err != nil {
+// 		return errorsmod.Wrap(sdkerrors.ErrPackAny, err.Error())
+// 	}
 
-	c.Extension = codecAny
-	return nil
-}
+// 	c.Extension = codecAny
+// 	return nil
+// }
 
 // ReadExtension copies the extension value to the pointer passed as argument so that there is no need to cast
 // For example with a custom extension of type `MyContractDetails` it will look as following:
@@ -136,39 +136,39 @@ func (c *ContractInfo) SetExtension(ext ContractInfoExtension) error {
 //	if err := info.ReadExtension(&d); err != nil {
 //		return nil, errorsmod.Wrap(err, "extension")
 //	}
-func (c *ContractInfo) ReadExtension(e ContractInfoExtension) error {
-	rv := reflect.ValueOf(e)
-	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidType, "not a pointer")
-	}
-	if c.Extension == nil {
-		return nil
-	}
+// func (c *ContractInfo) ReadExtension(e ContractInfoExtension) error {
+// 	rv := reflect.ValueOf(e)
+// 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
+// 		return errorsmod.Wrap(sdkerrors.ErrInvalidType, "not a pointer")
+// 	}
+// 	if c.Extension == nil {
+// 		return nil
+// 	}
 
-	cached := c.Extension.GetCachedValue()
-	elem := reflect.ValueOf(cached).Elem()
-	if !elem.Type().AssignableTo(rv.Elem().Type()) {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidType, "extension is of type %s but argument of %s", elem.Type(), rv.Elem().Type())
-	}
-	rv.Elem().Set(elem)
-	return nil
-}
+// 	cached := c.Extension.GetCachedValue()
+// 	elem := reflect.ValueOf(cached).Elem()
+// 	if !elem.Type().AssignableTo(rv.Elem().Type()) {
+// 		return errorsmod.Wrapf(sdkerrors.ErrInvalidType, "extension is of type %s but argument of %s", elem.Type(), rv.Elem().Type())
+// 	}
+// 	rv.Elem().Set(elem)
+// 	return nil
+// }
 
 func (c ContractInfo) InitialHistory(initMsg []byte) ContractCodeHistoryEntry {
 	return ContractCodeHistoryEntry{
-		Operation: ContractCodeHistoryOperationTypeInit,
-		CodeID:    c.CodeID,
-		Updated:   c.Created,
-		Msg:       initMsg,
+		// Operation: ContractCodeHistoryOperationTypeInit,
+		CodeID:  c.CodeID,
+		Updated: c.Created,
+		Msg:     initMsg,
 	}
 }
 
 func (c *ContractInfo) AddMigration(ctx sdk.Context, codeID uint64, msg []byte) ContractCodeHistoryEntry {
 	h := ContractCodeHistoryEntry{
-		Operation: ContractCodeHistoryOperationTypeMigrate,
-		CodeID:    codeID,
-		Updated:   NewAbsoluteTxPosition(ctx),
-		Msg:       msg,
+		// Operation: ContractCodeHistoryOperationTypeMigrate,
+		CodeID:  codeID,
+		Updated: NewAbsoluteTxPosition(ctx),
+		Msg:     msg,
 	}
 	c.CodeID = codeID
 	return h
@@ -192,16 +192,16 @@ type ContractInfoExtension interface {
 	String() string
 }
 
-var _ codectypes.UnpackInterfacesMessage = &ContractInfo{}
+// var _ codectypes.UnpackInterfacesMessage = &ContractInfo{}
 
 // UnpackInterfaces implements codectypes.UnpackInterfaces
-func (c *ContractInfo) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
-	var details ContractInfoExtension
-	if err := unpacker.UnpackAny(c.Extension, &details); err != nil {
-		return err
-	}
-	return codectypes.UnpackInterfaces(details, unpacker)
-}
+// func (c *ContractInfo) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+// 	var details ContractInfoExtension
+// 	if err := unpacker.UnpackAny(c.Extension, &details); err != nil {
+// 		return err
+// 	}
+// 	return codectypes.UnpackInterfaces(details, unpacker)
+// }
 
 // NewAbsoluteTxPosition gets a block position from the context
 func NewAbsoluteTxPosition(ctx sdk.Context) *AbsoluteTxPosition {
@@ -248,16 +248,16 @@ func (a *AbsoluteTxPosition) Bytes() []byte {
 
 // ValidateBasic syntax checks
 func (c ContractCodeHistoryEntry) ValidateBasic() error {
-	var found bool
-	for _, v := range AllCodeHistoryTypes {
-		if c.Operation == v {
-			found = true
-			break
-		}
-	}
-	if !found {
-		return ErrInvalid.Wrap("operation")
-	}
+	// var found bool
+	// for _, v := range AllCodeHistoryTypes {
+	// 	if c.Operation == v {
+	// 		found = true
+	// 		break
+	// 	}
+	// }
+	// if !found {
+	// 	return ErrInvalid.Wrap("operation")
+	// }
 	if c.CodeID == 0 {
 		return ErrEmpty.Wrap("code id")
 	}

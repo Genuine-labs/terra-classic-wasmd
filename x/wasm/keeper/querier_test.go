@@ -410,65 +410,65 @@ func TestQueryContractHistory(t *testing.T) {
 	}{
 		"response with internal fields cleared": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeGenesis,
-				CodeID:    1,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
-				Msg:       []byte(`"init message"`),
+				//Operation: types.ContractCodeHistoryOperationTypeGenesis,
+				CodeID:  1,
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
+				Msg:     []byte(`"init message"`),
 			}},
 			req: types.QueryContractHistoryRequest{Address: myContractBech32Addr},
 			expContent: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeGenesis,
-				CodeID:    1,
-				Msg:       []byte(`"init message"`),
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
+				//Operation: types.ContractCodeHistoryOperationTypeGenesis,
+				CodeID:  1,
+				Msg:     []byte(`"init message"`),
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
 			}},
 		},
 		"response with multiple entries": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeInit,
-				CodeID:    1,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
-				Msg:       []byte(`"init message"`),
+				//Operation: types.ContractCodeHistoryOperationTypeInit,
+				CodeID:  1,
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
+				Msg:     []byte(`"init message"`),
 			}, {
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    2,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
-				Msg:       []byte(`"migrate message 1"`),
+				//Operation: types.ContractCodeHistoryOperationTypeMigrate,
+				CodeID:  2,
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
+				Msg:     []byte(`"migrate message 1"`),
 			}, {
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    3,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 5, TxIndex: 6},
-				Msg:       []byte(`"migrate message 2"`),
+				//Operation: types.ContractCodeHistoryOperationTypeMigrate,
+				CodeID:  3,
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 5, TxIndex: 6},
+				Msg:     []byte(`"migrate message 2"`),
 			}},
 			req: types.QueryContractHistoryRequest{Address: myContractBech32Addr},
 			expContent: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeInit,
-				CodeID:    1,
-				Msg:       []byte(`"init message"`),
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
+				//Operation: types.ContractCodeHistoryOperationTypeInit,
+				CodeID:  1,
+				Msg:     []byte(`"init message"`),
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
 			}, {
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    2,
-				Msg:       []byte(`"migrate message 1"`),
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
+				//Operation: types.ContractCodeHistoryOperationTypeMigrate,
+				CodeID:  2,
+				Msg:     []byte(`"migrate message 1"`),
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
 			}, {
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    3,
-				Msg:       []byte(`"migrate message 2"`),
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 5, TxIndex: 6},
+				//Operation: types.ContractCodeHistoryOperationTypeMigrate,
+				CodeID:  3,
+				Msg:     []byte(`"migrate message 2"`),
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 5, TxIndex: 6},
 			}},
 		},
 		"with pagination offset": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeInit,
-				CodeID:    1,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
-				Msg:       []byte(`"init message"`),
+				//Operation: types.ContractCodeHistoryOperationTypeInit,
+				CodeID:  1,
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
+				Msg:     []byte(`"init message"`),
 			}, {
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    2,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
-				Msg:       []byte(`"migrate message 1"`),
+				//Operation: types.ContractCodeHistoryOperationTypeMigrate,
+				CodeID:  2,
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
+				Msg:     []byte(`"migrate message 1"`),
 			}},
 			req: types.QueryContractHistoryRequest{
 				Address: myContractBech32Addr,
@@ -480,15 +480,15 @@ func TestQueryContractHistory(t *testing.T) {
 		},
 		"with pagination limit": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeInit,
-				CodeID:    1,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
-				Msg:       []byte(`"init message"`),
+				//Operation: types.ContractCodeHistoryOperationTypeInit,
+				CodeID:  1,
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
+				Msg:     []byte(`"init message"`),
 			}, {
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    2,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
-				Msg:       []byte(`"migrate message 1"`),
+				//Operation: types.ContractCodeHistoryOperationTypeMigrate,
+				CodeID:  2,
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
+				Msg:     []byte(`"migrate message 1"`),
 			}},
 			req: types.QueryContractHistoryRequest{
 				Address: myContractBech32Addr,
@@ -497,19 +497,19 @@ func TestQueryContractHistory(t *testing.T) {
 				},
 			},
 			expContent: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeInit,
-				CodeID:    1,
-				Msg:       []byte(`"init message"`),
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
+				//Operation: types.ContractCodeHistoryOperationTypeInit,
+				CodeID:  1,
+				Msg:     []byte(`"init message"`),
+				Updated: &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
 			}},
 		},
 		"unknown contract address": {
 			req: types.QueryContractHistoryRequest{Address: otherBech32Addr},
 			srcHistory: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeGenesis,
-				CodeID:    1,
-				Updated:   types.NewAbsoluteTxPosition(ctx),
-				Msg:       []byte(`"init message"`),
+				//Operation: types.ContractCodeHistoryOperationTypeGenesis,
+				CodeID:  1,
+				Updated: types.NewAbsoluteTxPosition(ctx),
+				Msg:     []byte(`"init message"`),
 			}},
 			expContent: []types.ContractCodeHistoryEntry{},
 		},
@@ -624,11 +624,11 @@ func TestQueryContractInfo(t *testing.T) {
 	)
 	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
 	// register an example extension. must be protobuf
-	keepers.EncodingConfig.InterfaceRegistry.RegisterImplementations(
-		(*types.ContractInfoExtension)(nil),
-		&govv1beta1.Proposal{},
-	)
-	govv1beta1.RegisterInterfaces(keepers.EncodingConfig.InterfaceRegistry)
+	// keepers.EncodingConfig.InterfaceRegistry.RegisterImplementations(
+	// 	(*types.ContractInfoExtension)(nil),
+	// 	&govv1beta1.Proposal{},
+	// )
+	// govv1beta1.RegisterInterfaces(keepers.EncodingConfig.InterfaceRegistry)
 
 	k := keepers.WasmKeeper
 	querier := NewGrpcQuerier(k.cdc, k.storeKey, k, k.queryGasLimit)
@@ -637,8 +637,8 @@ func TestQueryContractInfo(t *testing.T) {
 		myExt, err := govv1beta1.NewProposal(&govv1beta1.TextProposal{Title: "foo", Description: "bar"}, 1, anyDate, anyDate)
 		require.NoError(t, err)
 		myExt.TotalDeposit = nil
-		err = info.SetExtension(&myExt)
-		require.NoError(t, err)
+		// err = info.SetExtension(&myExt)
+		// require.NoError(t, err)
 	}
 	specs := map[string]struct {
 		src    *types.QueryContractInfoRequest
@@ -650,7 +650,7 @@ func TestQueryContractInfo(t *testing.T) {
 			src:    &types.QueryContractInfoRequest{Address: contractAddr.String()},
 			stored: types.ContractInfoFixture(),
 			expRsp: &types.QueryContractInfoResponse{
-				Address:      contractAddr.String(),
+				// Address:      contractAddr.String(),
 				ContractInfo: types.ContractInfoFixture(),
 			},
 		},
@@ -658,7 +658,7 @@ func TestQueryContractInfo(t *testing.T) {
 			src:    &types.QueryContractInfoRequest{Address: contractAddr.String()},
 			stored: types.ContractInfoFixture(myExtension),
 			expRsp: &types.QueryContractInfoResponse{
-				Address:      contractAddr.String(),
+				// Address:      contractAddr.String(),
 				ContractInfo: types.ContractInfoFixture(myExtension),
 			},
 		},

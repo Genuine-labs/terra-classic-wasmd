@@ -52,25 +52,25 @@ func TestContractInfoValidateBasic(t *testing.T) {
 			srcMutator: func(c *ContractInfo) { c.Label = strings.Repeat("a", MaxLabelSize+1) },
 			expError:   true,
 		},
-		"invalid extension": {
-			srcMutator: func(c *ContractInfo) {
-				// any protobuf type with ValidateBasic method
-				codecAny, err := codectypes.NewAnyWithValue(&v1beta1.TextProposal{})
+		// "invalid extension": {
+		// 	srcMutator: func(c *ContractInfo) {
+		// 		// any protobuf type with ValidateBasic method
+		// 		codecAny, err := codectypes.NewAnyWithValue(&v1beta1.TextProposal{})
 
-				require.NoError(t, err)
-				c.Extension = codecAny
-			},
-			expError: true,
-		},
-		"not validatable extension": {
-			srcMutator: func(c *ContractInfo) {
-				// any protobuf type with ValidateBasic method
-				codecAny, err := codectypes.NewAnyWithValue(&v1beta1.Proposal{})
+		// 		require.NoError(t, err)
+		// 		c.Extension = codecAny
+		// 	},
+		// 	expError: true,
+		// },
+		// "not validatable extension": {
+		// 	srcMutator: func(c *ContractInfo) {
+		// 		// any protobuf type with ValidateBasic method
+		// 		codecAny, err := codectypes.NewAnyWithValue(&v1beta1.Proposal{})
 
-				require.NoError(t, err)
-				c.Extension = codecAny
-			},
-		},
+		// 		require.NoError(t, err)
+		// 		c.Extension = codecAny
+		// 	},
+		// },
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
@@ -125,53 +125,53 @@ func TestCodeInfoValidateBasic(t *testing.T) {
 	}
 }
 
-func TestContractInfoSetExtension(t *testing.T) {
-	anyTime := time.Now().UTC()
-	aNestedProtobufExt := func() ContractInfoExtension {
-		// using gov proposal here as a random protobuf types as it contains an Any type inside for nested unpacking
-		myExtension, err := v1beta1.NewProposal(&v1beta1.TextProposal{Title: "bar"}, 1, anyTime, anyTime)
-		require.NoError(t, err)
-		myExtension.TotalDeposit = nil
-		return &myExtension
-	}
+// func TestContractInfoSetExtension(t *testing.T) {
+// 	anyTime := time.Now().UTC()
+// 	aNestedProtobufExt := func() ContractInfoExtension {
+// 		// using gov proposal here as a random protobuf types as it contains an Any type inside for nested unpacking
+// 		myExtension, err := v1beta1.NewProposal(&v1beta1.TextProposal{Title: "bar"}, 1, anyTime, anyTime)
+// 		require.NoError(t, err)
+// 		myExtension.TotalDeposit = nil
+// 		return &myExtension
+// 	}
 
-	specs := map[string]struct {
-		src    ContractInfoExtension
-		expErr bool
-		expNil bool
-	}{
-		"all good with any proto extension": {
-			src: aNestedProtobufExt(),
-		},
-		"nil allowed": {
-			src:    nil,
-			expNil: true,
-		},
-		"validated and accepted": {
-			src: &v1beta1.TextProposal{Title: "bar", Description: "set"},
-		},
-		"validated and rejected": {
-			src:    &v1beta1.TextProposal{Title: "bar"},
-			expErr: true,
-		},
-	}
-	for name, spec := range specs {
-		t.Run(name, func(t *testing.T) {
-			var c ContractInfo
-			gotErr := c.SetExtension(spec.src)
-			if spec.expErr {
-				require.Error(t, gotErr)
-				return
-			}
-			require.NoError(t, gotErr)
-			if spec.expNil {
-				return
-			}
-			require.NotNil(t, c.Extension)
-			assert.NotNil(t, c.Extension.GetCachedValue())
-		})
-	}
-}
+// 	specs := map[string]struct {
+// 		src    ContractInfoExtension
+// 		expErr bool
+// 		expNil bool
+// 	}{
+// 		"all good with any proto extension": {
+// 			src: aNestedProtobufExt(),
+// 		},
+// 		"nil allowed": {
+// 			src:    nil,
+// 			expNil: true,
+// 		},
+// 		"validated and accepted": {
+// 			src: &v1beta1.TextProposal{Title: "bar", Description: "set"},
+// 		},
+// 		"validated and rejected": {
+// 			src:    &v1beta1.TextProposal{Title: "bar"},
+// 			expErr: true,
+// 		},
+// 	}
+// 	for name, spec := range specs {
+// 		t.Run(name, func(t *testing.T) {
+// 			var c ContractInfo
+// 			gotErr := c.SetExtension(spec.src)
+// 			if spec.expErr {
+// 				require.Error(t, gotErr)
+// 				return
+// 			}
+// 			require.NoError(t, gotErr)
+// 			if spec.expNil {
+// 				return
+// 			}
+// 			require.NotNil(t, c.Extension)
+// 			assert.NotNil(t, c.Extension.GetCachedValue())
+// 		})
+// 	}
+// }
 
 func TestContractInfoMarshalUnmarshal(t *testing.T) {
 	var myAddr sdk.AccAddress = rand.Bytes(ContractAddrLen)
@@ -185,8 +185,8 @@ func TestContractInfoMarshalUnmarshal(t *testing.T) {
 	myExtension.TotalDeposit = nil
 
 	src := NewContractInfo(1, myAddr, myOtherAddr, "bar", &anyPos)
-	err = src.SetExtension(&myExtension)
-	require.NoError(t, err)
+	// err = src.SetExtension(&myExtension)
+	// require.NoError(t, err)
 
 	interfaceRegistry := codectypes.NewInterfaceRegistry()
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
@@ -210,90 +210,90 @@ func TestContractInfoMarshalUnmarshal(t *testing.T) {
 	assert.Equal(t, src, dest)
 	// and sanity check nested any
 	var destExt v1beta1.Proposal
-	require.NoError(t, dest.ReadExtension(&destExt))
+	// require.NoError(t, dest.ReadExtension(&destExt))
 	assert.Equal(t, destExt.GetTitle(), "bar")
 }
 
-func TestContractInfoReadExtension(t *testing.T) {
-	anyTime := time.Now().UTC()
-	myExtension, err := v1beta1.NewProposal(&v1beta1.TextProposal{Title: "foo"}, 1, anyTime, anyTime)
-	require.NoError(t, err)
-	type TestExtensionAsStruct struct {
-		ContractInfoExtension
-	}
+// func TestContractInfoReadExtension(t *testing.T) {
+// 	anyTime := time.Now().UTC()
+// 	myExtension, err := v1beta1.NewProposal(&v1beta1.TextProposal{Title: "foo"}, 1, anyTime, anyTime)
+// 	require.NoError(t, err)
+// 	type TestExtensionAsStruct struct {
+// 		ContractInfoExtension
+// 	}
 
-	specs := map[string]struct {
-		setup  func(*ContractInfo)
-		param  func() ContractInfoExtension
-		expVal ContractInfoExtension
-		expErr bool
-	}{
-		"all good": {
-			setup: func(i *ContractInfo) {
-				err = i.SetExtension(&myExtension)
-				require.NoError(t, err)
-			},
-			param: func() ContractInfoExtension {
-				return &v1beta1.Proposal{}
-			},
-			expVal: &myExtension,
-		},
-		"no extension set": {
-			setup: func(i *ContractInfo) {
-			},
-			param: func() ContractInfoExtension {
-				return &v1beta1.Proposal{}
-			},
-			expVal: &v1beta1.Proposal{},
-		},
-		"nil argument value": {
-			setup: func(i *ContractInfo) {
-				err = i.SetExtension(&myExtension)
-				require.NoError(t, err)
-			},
-			param: func() ContractInfoExtension {
-				return nil
-			},
-			expErr: true,
-		},
-		"non matching types": {
-			setup: func(i *ContractInfo) {
-				err = i.SetExtension(&myExtension)
-				require.NoError(t, err)
-			},
-			param: func() ContractInfoExtension {
-				return &v1beta1.TextProposal{}
-			},
-			expErr: true,
-		},
-		"not a pointer argument": {
-			setup: func(i *ContractInfo) {
-			},
-			param: func() ContractInfoExtension {
-				return TestExtensionAsStruct{}
-			},
-			expErr: true,
-		},
-	}
-	for name, spec := range specs {
-		t.Run(name, func(t *testing.T) {
-			var c ContractInfo
-			spec.setup(&c)
-			// when
+// 	specs := map[string]struct {
+// 		setup  func(*ContractInfo)
+// 		param  func() ContractInfoExtension
+// 		expVal ContractInfoExtension
+// 		expErr bool
+// 	}{
+// 		"all good": {
+// 			setup: func(i *ContractInfo) {
+// 				err = i.SetExtension(&myExtension)
+// 				require.NoError(t, err)
+// 			},
+// 			param: func() ContractInfoExtension {
+// 				return &v1beta1.Proposal{}
+// 			},
+// 			expVal: &myExtension,
+// 		},
+// 		"no extension set": {
+// 			setup: func(i *ContractInfo) {
+// 			},
+// 			param: func() ContractInfoExtension {
+// 				return &v1beta1.Proposal{}
+// 			},
+// 			expVal: &v1beta1.Proposal{},
+// 		},
+// 		"nil argument value": {
+// 			setup: func(i *ContractInfo) {
+// 				err = i.SetExtension(&myExtension)
+// 				require.NoError(t, err)
+// 			},
+// 			param: func() ContractInfoExtension {
+// 				return nil
+// 			},
+// 			expErr: true,
+// 		},
+// 		"non matching types": {
+// 			setup: func(i *ContractInfo) {
+// 				err = i.SetExtension(&myExtension)
+// 				require.NoError(t, err)
+// 			},
+// 			param: func() ContractInfoExtension {
+// 				return &v1beta1.TextProposal{}
+// 			},
+// 			expErr: true,
+// 		},
+// 		"not a pointer argument": {
+// 			setup: func(i *ContractInfo) {
+// 			},
+// 			param: func() ContractInfoExtension {
+// 				return TestExtensionAsStruct{}
+// 			},
+// 			expErr: true,
+// 		},
+// 	}
+// 	for name, spec := range specs {
+// 		t.Run(name, func(t *testing.T) {
+// 			var c ContractInfo
+// 			spec.setup(&c)
+// 			// when
 
-			gotValue := spec.param()
-			gotErr := c.ReadExtension(gotValue)
+// 			gotValue := spec.param()
+// 			gotErr := c.ReadExtension(gotValue)
 
-			// then
-			if spec.expErr {
-				require.Error(t, gotErr)
-				return
-			}
-			require.NoError(t, gotErr)
-			assert.Equal(t, spec.expVal, gotValue)
-		})
-	}
-}
+// 			// then
+// 			if spec.expErr {
+// 				require.Error(t, gotErr)
+// 				return
+// 			}
+// 			require.NoError(t, gotErr)
+// 			assert.Equal(t, spec.expVal, gotValue)
+// 		})
+// 	}
+// }
 
 func TestNewEnv(t *testing.T) {
 	myTime := time.Unix(0, 1619700924259075000)
@@ -601,12 +601,6 @@ func TestContractCodeHistoryEntryValidation(t *testing.T) {
 	}{
 		"all good": {
 			src: ContractCodeHistoryEntryFixture(),
-		},
-		"unknown operation": {
-			src: ContractCodeHistoryEntryFixture(func(entry *ContractCodeHistoryEntry) {
-				entry.Operation = 0
-			}),
-			expErr: true,
 		},
 		"empty code id": {
 			src: ContractCodeHistoryEntryFixture(func(entry *ContractCodeHistoryEntry) {
