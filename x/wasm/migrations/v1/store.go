@@ -7,7 +7,7 @@ import (
 )
 
 // AddToSecondIndexFn creates a secondary index entry for the creator fo the contract
-type AddToSecondIndexFn func(ctx sdk.Context, creatorAddress sdk.AccAddress, position *types.AbsoluteTxPosition, contractAddress sdk.AccAddress)
+type Migrate func(ctx sdk.Context) error
 
 // Keeper abstract keeper
 type wasmKeeper interface {
@@ -16,21 +16,16 @@ type wasmKeeper interface {
 
 // Migrator is a struct for handling in-place store migrations.
 type Migrator struct {
-	keeper             wasmKeeper
-	addToSecondIndexFn AddToSecondIndexFn
+	keeper  wasmKeeper
+	migrate Migrate
 }
 
 // NewMigrator returns a new Migrator.
-func NewMigrator(k wasmKeeper, fn AddToSecondIndexFn) Migrator {
-	return Migrator{keeper: k, addToSecondIndexFn: fn}
+func NewMigrator(k wasmKeeper, fn Migrate) Migrator {
+	return Migrator{keeper: k, migrate: fn}
 }
 
 // Migrate1to2 migrates from version 1 to 2.
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	m.keeper.IterateContractInfo(ctx, func(contractAddr sdk.AccAddress, contractInfo types.ContractInfo) bool {
-		creator := sdk.MustAccAddressFromBech32(contractInfo.Creator)
-		m.addToSecondIndexFn(ctx, creator, contractInfo.Created, contractAddr)
-		return false
-	})
-	return nil
+	return m.migrate(ctx)
 }
