@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"bytes"
-	"encoding/binary"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -124,43 +123,4 @@ func newLegacyContract(wasmkeeper *Keeper, ctx sdk.Context, creator sdk.AccAddre
 	wasmkeeper.SetLegacyContractInfo(ctx, contractAddress, contract)
 
 	return contract
-}
-
-// StoreCodeLegacy stores a legacy code info into the code info store
-func newLegacyCode(wasmkeeper *Keeper, ctx sdk.Context, id uint64, creator sdk.AccAddress, hash []byte) legacytypes.CodeInfo {
-	codeInfo := legacytypes.NewCodeInfo(id, creator, hash)
-	wasmkeeper.SetLegacyCodeInfo(ctx, id, codeInfo)
-	wasmkeeper.Logger(ctx).Debug("storing new contract", "code_id", id)
-
-	return codeInfo
-}
-
-// newCodeInfoLegacy stores CodeInfo for the given codeID in legacy store
-func newCodeInfoLegacy(wasmkeeper *Keeper, ctx sdk.Context, codeID uint64, codeInfo legacytypes.CodeInfo) {
-	store := ctx.KVStore(wasmkeeper.storeKey)
-	bz := wasmkeeper.cdc.MustMarshal(&codeInfo)
-	store.Set(types.GetCodeKey(codeID), bz)
-}
-
-// SetLastCodeID sets last code id in legacy store
-func setLastCodeIDLegacy(wasmkeeper *Keeper, ctx sdk.Context, id uint64) {
-	store := ctx.KVStore(wasmkeeper.storeKey)
-	bz := sdk.Uint64ToBigEndian(id)
-	store.Set(legacytypes.LastCodeIDKey, bz)
-}
-
-// GetLastCodeID return last code ID from legacy store
-func getLastCodeIDLegacy(wasmkeeper *Keeper, ctx sdk.Context) (uint64, error) {
-	store := ctx.KVStore(wasmkeeper.storeKey)
-	bz := store.Get(legacytypes.LastCodeIDKey)
-	if bz == nil {
-		// if it is not set we set it here
-		// normally this would have been set
-		// on genesis - but we don't have that
-		// for legacy wasm
-		setLastCodeIDLegacy(wasmkeeper, ctx, 1)
-		return 1, nil
-	}
-
-	return binary.BigEndian.Uint64(bz), nil
 }
