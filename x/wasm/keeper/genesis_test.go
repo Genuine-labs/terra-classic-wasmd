@@ -698,9 +698,7 @@ var _ MessageRouter = &MockMsgHandler{}
 type MockMsgHandler struct {
 	result   *sdk.Result
 	err      error
-	expCalls int //nolint:unused
 	gotCalls int
-	expMsg   sdk.Msg //nolint:unused
 	gotMsg   sdk.Msg
 }
 
