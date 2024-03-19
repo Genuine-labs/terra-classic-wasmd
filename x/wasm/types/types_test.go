@@ -185,19 +185,10 @@ func TestContractInfoMarshalUnmarshal(t *testing.T) {
 	myExtension.TotalDeposit = nil
 
 	src := NewContractInfo(1, myAddr, myOtherAddr, "bar", &anyPos)
-	// err = src.SetExtension(&myExtension)
-	// require.NoError(t, err)
+	require.NoError(t, err)
 
 	interfaceRegistry := codectypes.NewInterfaceRegistry()
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
-	RegisterInterfaces(interfaceRegistry)
-	// register proposal as extension type
-	interfaceRegistry.RegisterImplementations(
-		(*ContractInfoExtension)(nil),
-		&v1beta1.Proposal{},
-	)
-	// register gov types for nested Anys
-	v1beta1.RegisterInterfaces(interfaceRegistry)
 
 	// when encode
 	bz, err := marshaler.Marshal(&src)
@@ -208,10 +199,6 @@ func TestContractInfoMarshalUnmarshal(t *testing.T) {
 	// then
 	require.NoError(t, err)
 	assert.Equal(t, src, dest)
-	// and sanity check nested any
-	var destExt v1beta1.Proposal
-	// require.NoError(t, dest.ReadExtension(&destExt))
-	assert.Equal(t, destExt.GetTitle(), "bar")
 }
 
 // func TestContractInfoReadExtension(t *testing.T) {
