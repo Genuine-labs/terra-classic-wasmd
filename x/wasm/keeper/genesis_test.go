@@ -546,8 +546,8 @@ func TestImportContractWithCodeHistoryPreserved(t *testing.T) {
     }
   ],
   "sequences": [
-  {"id_key": "BGxhc3RDb2RlSWQ=", "value": "2"},
-  {"id_key": "BGxhc3RDb250cmFjdElk", "value": "3"}
+	{"id_key": "AQ==", "value": "2"},
+	{"id_key": "Ag==", "value": "3"}
   ]
 }`
 	keeper, ctx := setupKeeper(t)

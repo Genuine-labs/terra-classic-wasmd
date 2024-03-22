@@ -375,7 +375,7 @@ func TestQueryContractsByCode(t *testing.T) {
 					Key: fromBase64("AAAAAAAAAAoAAAAAAAOc/4cuhNIMvyvID4NhhfROlbQNuZ0fl0clmBPoWHtKYazH"),
 				},
 			},
-			expAddr: contractAddrs[1:10],
+			expAddr: contractAddrs[2:10],
 		},
 	}
 	for msg, spec := range specs {
