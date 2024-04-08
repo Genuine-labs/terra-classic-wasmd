@@ -21,6 +21,9 @@ func InitGenesis(ctx sdk.Context, keeper *Keeper, data types.GenesisState, staki
 	keeper.SetParams(ctx, data.Params)
 	var maxCodeID uint64
 	for i, code := range data.Codes {
+		if len(code.CodeInfo.CodeHash) == 0 {
+			continue
+		}
 		err := keeper.importCode(ctx, code.CodeID, code.CodeInfo, code.CodeBytes)
 		if err != nil {
 			return nil, sdkerrors.Wrapf(err, "code %d with id: %d", i, code.CodeID)
