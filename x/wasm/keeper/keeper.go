@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"bytes"
 	"context"
 	"encoding/binary"
 	"encoding/hex"
@@ -251,13 +250,13 @@ func (k Keeper) importCode(ctx sdk.Context, codeID uint64, codeInfo types.CodeIn
 			return sdkerrors.Wrap(types.ErrCreateFailed, err.Error())
 		}
 	}
-	newCodeHash, err := k.wasmVM.Create(wasmCode)
-	if err != nil {
-		return sdkerrors.Wrap(types.ErrCreateFailed, err.Error())
-	}
-	if !bytes.Equal(codeInfo.CodeHash, newCodeHash) {
-		return sdkerrors.Wrap(types.ErrInvalid, "code hashes not same")
-	}
+	// newCodeHash, err := k.wasmVM.Create(wasmCode)
+	// if err != nil {
+	// 	return sdkerrors.Wrap(types.ErrCreateFailed, err.Error())
+	// }
+	// if !bytes.Equal(codeInfo.CodeHash, newCodeHash) {
+	// 	return sdkerrors.Wrap(types.ErrInvalid, "code hashes not same")
+	// }
 
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetCodeKey(codeID)
