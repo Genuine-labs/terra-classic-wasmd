@@ -266,16 +266,16 @@ func queryCode(ctx sdk.Context, codeID uint64, keeper types.ViewKeeper) (*types.
 	if codeID == 0 {
 		return nil, nil
 	}
-	res := keeper.GetCodeInfo(ctx, codeID)
-	if res == nil {
-		// nil, nil leads to 404 in rest handler
-		return nil, nil
-	}
+	// res := keeper.GetCodeInfo(ctx, codeID)
+	// if res == nil {
+	// 	// nil, nil leads to 404 in rest handler
+	// 	return nil, nil
+	// }
 	info := types.CodeInfoResponse{
 		CodeID:                codeID,
-		Creator:               res.Creator,
-		DataHash:              res.CodeHash,
-		InstantiatePermission: res.InstantiateConfig,
+		Creator:               "nil",
+		DataHash:              nil,
+		InstantiatePermission: types.AllowEverybody,
 	}
 
 	code, err := keeper.GetByteCode(ctx, codeID)
