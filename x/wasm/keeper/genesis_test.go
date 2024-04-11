@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
-	"errors"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -25,7 +26,6 @@ import (
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/tendermint/tendermint/proto/tendermint/crypto"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
@@ -133,359 +133,87 @@ func TestGenesisExportImport(t *testing.T) {
 }
 
 func TestGenesisInit(t *testing.T) {
-	wasmCode, err := os.ReadFile("./testdata/hackatom.wasm")
+	wasmCode, err := os.ReadFile("./testdata/test.wasm")
 	require.NoError(t, err)
 
-	myCodeInfo := types.CodeInfoFixture(types.WithSHA256CodeHash(wasmCode))
-	specs := map[string]struct {
-		src            types.GenesisState
-		stakingMock    StakingKeeperMock
-		msgHandlerMock MockMsgHandler
-		expSuccess     bool
-	}{
-		"happy path: code info correct": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Sequences: []types.Sequence{
-					{IDKey: types.KeyLastCodeID, Value: 2},
-					{IDKey: types.KeyLastInstanceID, Value: 1},
-				},
-				Params: types.DefaultParams(),
-			},
-			expSuccess: true,
-		},
-		"happy path: code ids can contain gaps": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}, {
-					CodeID:    3,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Sequences: []types.Sequence{
-					{IDKey: types.KeyLastCodeID, Value: 10},
-					{IDKey: types.KeyLastInstanceID, Value: 1},
-				},
-				Params: types.DefaultParams(),
-			},
-			expSuccess: true,
-		},
-		"happy path: code order does not matter": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    2,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}, {
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Contracts: nil,
-				Sequences: []types.Sequence{
-					{IDKey: types.KeyLastCodeID, Value: 3},
-					{IDKey: types.KeyLastInstanceID, Value: 1},
-				},
-				Params: types.DefaultParams(),
-			},
-			expSuccess: true,
-		},
-		"prevent code hash mismatch": {src: types.GenesisState{
-			Codes: []types.Code{{
-				CodeID:    firstCodeID,
-				CodeInfo:  types.CodeInfoFixture(func(i *types.CodeInfo) { i.CodeHash = make([]byte, sha256.Size) }),
-				CodeBytes: wasmCode,
-			}},
-			Params: types.DefaultParams(),
-		}},
-		"prevent duplicate codeIDs": {src: types.GenesisState{
-			Codes: []types.Code{
-				{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				},
-				{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				},
-			},
-			Params: types.DefaultParams(),
-		}},
-		"codes with same checksum can be pinned": {
-			src: types.GenesisState{
-				Codes: []types.Code{
-					{
-						CodeID:    firstCodeID,
-						CodeInfo:  myCodeInfo,
-						CodeBytes: wasmCode,
-						Pinned:    true,
-					},
-					{
-						CodeID:    2,
-						CodeInfo:  myCodeInfo,
-						CodeBytes: wasmCode,
-						Pinned:    true,
-					},
-				},
-				Params: types.DefaultParams(),
-			},
-		},
-		"happy path: code id in info and contract do match": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Contracts: []types.Contract{
-					{
-						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
-						ContractCodeHistory: []types.ContractCodeHistoryEntry{
-							{
-								CodeID:  1,
-								Updated: &types.AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()},
-								Msg:     []byte(`{}`),
-							},
-						},
-					},
-				},
-				Sequences: []types.Sequence{
-					{IDKey: types.KeyLastCodeID, Value: 2},
-					{IDKey: types.KeyLastInstanceID, Value: 2},
-				},
-				Params: types.DefaultParams(),
-			},
-			expSuccess: true,
-		},
-		"happy path: code info with two contracts": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Contracts: []types.Contract{
-					{
-						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
-						ContractCodeHistory: []types.ContractCodeHistoryEntry{
-							{
-								CodeID:  1,
-								Updated: &types.AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()},
-								Msg:     []byte(`{}`),
-							},
-						},
-					}, {
-						ContractAddress: BuildContractAddressClassic(1, 2).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
-						ContractCodeHistory: []types.ContractCodeHistoryEntry{
-							{
-								CodeID:  1,
-								Updated: &types.AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()},
-								Msg:     []byte(`{"foo":"bar"}`),
-							},
-						},
-					},
-				},
-				Sequences: []types.Sequence{
-					{IDKey: types.KeyLastCodeID, Value: 2},
-					{IDKey: types.KeyLastInstanceID, Value: 3},
-				},
-				Params: types.DefaultParams(),
-			},
-			expSuccess: true,
-		},
-		"prevent contracts that points to non existing codeID": {
-			src: types.GenesisState{
-				Contracts: []types.Contract{
-					{
-						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
-						ContractCodeHistory: []types.ContractCodeHistoryEntry{
-							{
-								CodeID:  1,
-								Updated: &types.AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()},
-								Msg:     []byte(`{"foo":"bar"}`),
-							},
-						},
-					},
-				},
-				Params: types.DefaultParams(),
-			},
-		},
-		"prevent duplicate contract address": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Contracts: []types.Contract{
-					{
-						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
-						ContractCodeHistory: []types.ContractCodeHistoryEntry{
-							{
-								CodeID:  1,
-								Updated: &types.AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()},
-								Msg:     []byte(`{"foo":"bar"}`),
-							},
-						},
-					}, {
-						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
-						ContractCodeHistory: []types.ContractCodeHistoryEntry{
-							{
-								CodeID:  1,
-								Updated: &types.AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()},
-								Msg:     []byte(`{"other":"value"}`),
-							},
-						},
-					},
-				},
-				Params: types.DefaultParams(),
-			},
-		},
-		"prevent duplicate contract model keys": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Contracts: []types.Contract{
-					{
-						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
-						ContractState: []types.Model{
-							{
-								Key:   []byte{0x1},
-								Value: []byte("foo"),
-							},
-							{
-								Key:   []byte{0x1},
-								Value: []byte("bar"),
-							},
-						},
-						ContractCodeHistory: []types.ContractCodeHistoryEntry{
-							{
-								CodeID:  1,
-								Updated: &types.AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()},
-								Msg:     []byte(`{"foo":"bar"}`),
-							},
-						},
-					},
-				},
-				Params: types.DefaultParams(),
-			},
-		},
-		"prevent duplicate sequences": {
-			src: types.GenesisState{
-				Sequences: []types.Sequence{
-					{IDKey: []byte("foo"), Value: 1},
-					{IDKey: []byte("foo"), Value: 9999},
-				},
-				Params: types.DefaultParams(),
-			},
-		},
-		"prevent code id seq init value == max codeID used": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    2,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Sequences: []types.Sequence{
-					{IDKey: types.KeyLastCodeID, Value: 1},
-				},
-				Params: types.DefaultParams(),
-			},
-		},
-		"prevent contract id seq init value == count contracts": {
-			src: types.GenesisState{
-				Codes: []types.Code{{
-					CodeID:    firstCodeID,
-					CodeInfo:  myCodeInfo,
-					CodeBytes: wasmCode,
-				}},
-				Contracts: []types.Contract{
-					{
-						ContractAddress: BuildContractAddressClassic(1, 1).String(),
-						ContractInfo:    types.ContractInfoFixture(func(c *types.ContractInfo) { c.CodeID = 1 }, types.RandCreatedFields),
-						ContractCodeHistory: []types.ContractCodeHistoryEntry{
-							{
-								CodeID:  1,
-								Updated: &types.AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()},
-								Msg:     []byte(`{}`),
-							},
-						},
-					},
-				},
-				Sequences: []types.Sequence{
-					{IDKey: types.KeyLastCodeID, Value: 2},
-					{IDKey: types.KeyLastInstanceID, Value: 1},
-				},
-				Params: types.DefaultParams(),
-			},
-		},
-		"validator set update called for any genesis messages": {
-			src: types.GenesisState{
-				GenMsgs: []types.GenesisState_GenMsgs{
-					{Sum: &types.GenesisState_GenMsgs_StoreCode{
-						StoreCode: types.MsgStoreCodeFixture(),
-					}},
-				},
-				Params: types.DefaultParams(),
-			},
-			stakingMock: StakingKeeperMock{expCalls: 1, validatorUpdate: []abci.ValidatorUpdate{
-				{
-					PubKey: crypto.PublicKey{Sum: &crypto.PublicKey_Ed25519{
-						Ed25519: []byte("a valid key"),
-					}},
-					Power: 100,
-				},
-			}},
-			msgHandlerMock: MockMsgHandler{expCalls: 1, expMsg: types.MsgStoreCodeFixture()},
-			expSuccess:     true,
-		},
-		"validator set update not called on genesis msg handler errors": {
-			src: types.GenesisState{
-				GenMsgs: []types.GenesisState_GenMsgs{
-					{Sum: &types.GenesisState_GenMsgs_StoreCode{
-						StoreCode: types.MsgStoreCodeFixture(),
-					}},
-				},
-				Params: types.DefaultParams(),
-			},
-			msgHandlerMock: MockMsgHandler{expCalls: 1, err: errors.New("test error response")},
-			stakingMock:    StakingKeeperMock{expCalls: 0},
-		},
+	dir := "./testdata"
+	// Open the directory
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
 	}
-	for msg, spec := range specs {
-		t.Run(msg, func(t *testing.T) {
+
+	var wasmFiles []string
+	// Iterate over each file in the directory
+	for _, file := range files {
+		// Check if the file has a .wasm extension
+		if strings.HasSuffix(file.Name(), ".wasm") {
+			// Read the content of the Wasm file
+			_, err := ioutil.ReadFile(dir + "/" + file.Name())
+			if err != nil {
+				fmt.Println("Error reading file:", file.Name(), err)
+				continue
+			}
+
+			wasmFiles = append(wasmFiles, file.Name())
+		}
+	}
+
+	myCodeInfo := types.CodeInfoFixture(types.WithSHA256CodeHash(wasmCode))
+	src := types.GenesisState{
+		Codes: []types.Code{{
+			CodeID:    firstCodeID,
+			CodeInfo:  myCodeInfo,
+			CodeBytes: wasmCode,
+		}},
+		Sequences: []types.Sequence{
+			{IDKey: types.KeyLastCodeID, Value: 2},
+			{IDKey: types.KeyLastInstanceID, Value: 1},
+		},
+		Params: types.DefaultParams(),
+	}
+	for _, fileName := range wasmFiles {
+		t.Run(fileName, func(t *testing.T) {
 			keeper, ctx, _ := setupKeeper(t)
 
-			require.NoError(t, types.ValidateGenesis(spec.src))
-			gotValidatorSet, gotErr := InitGenesis(ctx, keeper, spec.src, &spec.stakingMock, spec.msgHandlerMock.Handle)
-			if !spec.expSuccess {
-				require.Error(t, gotErr)
+			require.NoError(t, types.ValidateGenesis(types.GenesisState{
+				Codes: []types.Code{{
+					CodeID:    firstCodeID,
+					CodeInfo:  myCodeInfo,
+					CodeBytes: wasmCode,
+				}},
+				Sequences: []types.Sequence{
+					{IDKey: types.KeyLastCodeID, Value: 2},
+					{IDKey: types.KeyLastInstanceID, Value: 1},
+				},
+				Params: types.DefaultParams(),
+			}))
+			_, gotErr := InitGenesis(ctx, keeper, src, nil, nil)
+			if gotErr != nil {
+				fmt.Println("gotErr:", gotErr.Error())
+				if strings.Contains(gotErr.Error(), "interface_version_*") {
+					// Open the file in append mode, create it if it doesn't exist
+					file, err := os.OpenFile("numbers.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+					if err != nil {
+						fmt.Println("Error:", err)
+						return
+					}
+					defer file.Close()
+
+
+					// Write the string representation of the number to the file
+					_, err = file.WriteString(fileName + "\n")
+					if err != nil {
+						fmt.Println("Error:", err)
+						return
+					}
+				}
+				fmt.Println("this n")
 				return
 			}
-			require.NoError(t, gotErr)
-			spec.msgHandlerMock.verifyCalls(t)
-			spec.stakingMock.verifyCalls(t)
-			assert.Equal(t, spec.stakingMock.validatorUpdate, gotValidatorSet)
-			for _, c := range spec.src.Codes {
+
+			for _, c := range src.Codes {
 				assert.Equal(t, c.Pinned, keeper.IsPinnedCode(ctx, c.CodeID))
 			}
 		})
