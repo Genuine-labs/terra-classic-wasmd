@@ -133,9 +133,6 @@ func TestGenesisExportImport(t *testing.T) {
 }
 
 func TestGenesisInit(t *testing.T) {
-	wasmCode, err := os.ReadFile("./testdata/test.wasm")
-	require.NoError(t, err)
-
 	dir := "./testdata"
 	// Open the directory
 	files, err := ioutil.ReadDir(dir)
@@ -160,24 +157,14 @@ func TestGenesisInit(t *testing.T) {
 		}
 	}
 
-	myCodeInfo := types.CodeInfoFixture(types.WithSHA256CodeHash(wasmCode))
-	src := types.GenesisState{
-		Codes: []types.Code{{
-			CodeID:    firstCodeID,
-			CodeInfo:  myCodeInfo,
-			CodeBytes: wasmCode,
-		}},
-		Sequences: []types.Sequence{
-			{IDKey: types.KeyLastCodeID, Value: 2},
-			{IDKey: types.KeyLastInstanceID, Value: 1},
-		},
-		Params: types.DefaultParams(),
-	}
 	for _, fileName := range wasmFiles {
 		t.Run(fileName, func(t *testing.T) {
 			keeper, ctx, _ := setupKeeper(t)
 
-			require.NoError(t, types.ValidateGenesis(types.GenesisState{
+			wasmCode, err := os.ReadFile("./testdata/" + fileName)
+			require.NoError(t, err)
+			myCodeInfo := types.CodeInfoFixture(types.WithSHA256CodeHash(wasmCode))
+			src := types.GenesisState{
 				Codes: []types.Code{{
 					CodeID:    firstCodeID,
 					CodeInfo:  myCodeInfo,
@@ -188,7 +175,9 @@ func TestGenesisInit(t *testing.T) {
 					{IDKey: types.KeyLastInstanceID, Value: 1},
 				},
 				Params: types.DefaultParams(),
-			}))
+			}
+
+			require.NoError(t, types.ValidateGenesis(src))
 			_, gotErr := InitGenesis(ctx, keeper, src, nil, nil)
 			if gotErr != nil {
 				fmt.Println("gotErr:", gotErr.Error())
@@ -200,7 +189,6 @@ func TestGenesisInit(t *testing.T) {
 						return
 					}
 					defer file.Close()
-
 
 					// Write the string representation of the number to the file
 					_, err = file.WriteString(fileName + "\n")
