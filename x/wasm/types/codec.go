@@ -33,7 +33,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgStoreAndMigrateContract{}, "wasm/MsgStoreAndMigrateContract", nil)
 	cdc.RegisterConcrete(&MsgUpdateContractLabel{}, "wasm/MsgUpdateContractLabel", nil)
 
-	cdc.RegisterInterface((*ContractInfoExtension)(nil), nil)
+	// cdc.RegisterInterface((*ContractInfoExtension)(nil), nil)
 
 	cdc.RegisterInterface((*ContractAuthzFilterX)(nil), nil)
 	cdc.RegisterConcrete(&AllowAllMessagesFilter{}, "wasm/AllowAllMessagesFilter", nil)
